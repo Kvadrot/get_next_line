@@ -6,7 +6,7 @@
 /*   By: itykhono <itykhono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 12:07:43 by itykhono          #+#    #+#             */
-/*   Updated: 2024/03/30 14:19:42 by itykhono         ###   ########.fr       */
+/*   Updated: 2024/03/30 19:24:18 by itykhono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,22 +23,6 @@ int	ft_strlen(char *str)
 	}
 	len++;
 	return (len);
-}
-
-char	*ft_strdup(char *s, int len)
-{
-	char	*newstr;
-
-	if (!s)
-	return (NULL);
-	newstr = (char *)malloc(len * sizeof(char));
-	if (!newstr)
-		return (NULL);
-	while (*s)
-	{
-		*newstr++ = *s++;
-	}
-	return (newstr);
 }
 
 void	*ft_strjoin(char **joined, char *s2, int s1len, int s2len)
@@ -64,8 +48,8 @@ void	*ft_strjoin(char **joined, char *s2, int s1len, int s2len)
 		ind++;
 		nextInd++;
 	}
-
-	free(*joined);
+	if (*joined != NULL)
+		free(*joined);
 	*joined = newstr;
 	return (NULL);
 }
@@ -92,14 +76,14 @@ char	*ft_substr(char *s, int start, int len)
 	return (substr);
 }
 
-int	ft_strchr(char *str)
+int	ft_strchr(char *str, int strlen)
 {
 	int ind;
 
 	ind = 0;
-	while (str[ind] != '\n' && ind < BUFFER_SIZE)
+	while (str[ind] != '\n' && ind < strlen) //BUFFER_SIZE
 		ind++;
-	if (str[ind] == '\n')
+	if (str[ind] == '\n' || str[ind] == '\0')
 		return (ind);
 	else
 		return (-404);
@@ -107,43 +91,38 @@ int	ft_strchr(char *str)
 
 char	*get_next_line(int fd)
 {
-	char		*buffer;
-	int			bytes_read;
+	static char	*buffer = NULL;
+	static int	bytes_read = 0;
 	char		*new_line;
 	int			new_linelen;
-	static char *rest_text;
-	static int	rest_len;
 
-	if (rest_text && rest_len > 0)
-		buffer = ft_strdup(rest_text, rest_len);
-
+	new_linelen = 0;
+	new_line = NULL;
 	if (!buffer)
 	{
 		buffer = (char *)malloc((BUFFER_SIZE) * sizeof(char));
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 	}
-
     if (bytes_read == -1)
-		return NULL;
+		return (NULL);
 
-	rest_len = 0;
-	new_linelen = rest_len;
-	new_line = rest_text;
-	while (ft_strchr(buffer) < 0)
+	while (ft_strchr(buffer, bytes_read) < 0)
 	{
-		ft_strjoin(&new_line, buffer, new_linelen, BUFFER_SIZE);
+		ft_strjoin(&new_line, buffer, new_linelen, bytes_read);
 		new_linelen += bytes_read;
-		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		bytes_read = read(fd, buffer, bytes_read);
 	}
+	char *s2 = ft_substr(buffer, 0, ft_strchr(buffer, bytes_read) + 1); //good job
+	ft_strjoin(&new_line, s2, new_linelen, ft_strchr(buffer, bytes_read) + 1);
+	new_linelen += ft_strchr(buffer, bytes_read) + 1;
 
-	ft_strjoin(&new_line, ft_substr(buffer, 0, ft_strchr(buffer) + 1), new_linelen, ft_strchr(buffer) + 1);
-	new_linelen += ft_strchr(buffer) + 1;
-	
-	if (rest_text)
-		free(rest_text);
-	rest_text = ft_substr(buffer, ft_strchr(buffer) + 1, bytes_read - (ft_strchr(buffer) + 1));
-	rest_len = bytes_read - (ft_strchr(buffer) + 1);
+	printf("\n=======================\n");
+	printf("buffer = %s \n", ft_substr(buffer, ft_strchr(buffer, bytes_read) + 1, bytes_read - (ft_strchr(buffer, bytes_read) + 1)));
+	printf("bytes_read = %d \n", bytes_read - (ft_strchr(buffer, bytes_read) + 1));
+	printf("\n=======================\n");
+		
+	buffer = ft_substr(buffer, ft_strchr(buffer, bytes_read) + 1, bytes_read - (ft_strchr(buffer, bytes_read) + 1));
+	bytes_read = bytes_read - (ft_strchr(buffer, bytes_read) + 1);
 
-	printf("rest_text =%s==", rest_text);
 	return (new_line);
 }
