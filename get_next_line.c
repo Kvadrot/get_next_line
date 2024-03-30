@@ -6,7 +6,7 @@
 /*   By: itykhono <itykhono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 12:07:43 by itykhono          #+#    #+#             */
-/*   Updated: 2024/03/30 19:24:18 by itykhono         ###   ########.fr       */
+/*   Updated: 2024/03/30 19:36:02 by itykhono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ char	*ft_substr(char *s, int start, int len)
 
 	if (len == 0)
 		return ("");
-	if (start + len > ft_strlen(s))
-		len = ft_strlen(s + start) + 1;
+	// if (start + len > ft_strlen(s))
+	// 	len = ft_strlen(s + start) + 1;
 	substr = (char *)malloc(len * sizeof(char));
 	if (!substr)
 		return (NULL);
@@ -116,12 +116,13 @@ char	*get_next_line(int fd)
 	ft_strjoin(&new_line, s2, new_linelen, ft_strchr(buffer, bytes_read) + 1);
 	new_linelen += ft_strchr(buffer, bytes_read) + 1;
 
-	printf("\n=======================\n");
-	printf("buffer = %s \n", ft_substr(buffer, ft_strchr(buffer, bytes_read) + 1, bytes_read - (ft_strchr(buffer, bytes_read) + 1)));
-	printf("bytes_read = %d \n", bytes_read - (ft_strchr(buffer, bytes_read) + 1));
-	printf("\n=======================\n");
+	// printf("\n=======================\n");
+	// printf("new_line = %s \n", new_line);
+	// printf("buffer = %s \n", ft_substr(buffer, new_linelen, bytes_read - new_linelen));
+	// printf("bytes_read = %d \n", bytes_read - (ft_strchr(buffer, bytes_read) + 1));
+	// printf("\n=======================\n");
 		
-	buffer = ft_substr(buffer, ft_strchr(buffer, bytes_read) + 1, bytes_read - (ft_strchr(buffer, bytes_read) + 1));
+	buffer = ft_substr(buffer, new_linelen, bytes_read - (ft_strchr(buffer, bytes_read) + 1));
 	bytes_read = bytes_read - (ft_strchr(buffer, bytes_read) + 1);
 
 	return (new_line);
