@@ -11,9 +11,15 @@ int main(int argc, char *argv[])
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
-
 	char *test = get_next_line(fd);
 	printf("nextlen = %s", test);
+
+	// char *test1 = get_next_line(fd);
+	// printf("nextlen = %s", test1);
+
+	// char *test2 = get_next_line(fd);
+	// printf("nextlen = %s", test2);
+
 
     // Close the file descriptor
     if (close(fd) == -1) {
