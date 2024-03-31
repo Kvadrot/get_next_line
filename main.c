@@ -13,14 +13,16 @@ int main(int argc, char *argv[])
     }
 
 
-	// char *test2 = get_next_line(fd);
-	// printf("nextlen = %s", test2);
-
-	for (int a = 5; a > 0; a--)
+	for (int a = 7; a > 0; a--)
 	{
 		char *test1 = get_next_line(fd);
 		printf("nextlen = %s", test1);
 	}
+
+	// char *test1 = get_next_line(fd);
+	// printf("nextlen = %s", test1);
+	// char *test2 = get_next_line(fd);
+	// printf("nextlen = %s", test2);
     // Close the file descriptor
     if (close(fd) == -1) {
         perror("Error closing file");
