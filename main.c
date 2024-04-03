@@ -2,11 +2,11 @@
 
 #include "get_next_line.h"
 
-int main(int argc, char *argv[])
+int main()
 {
 	int fd;
     // Open the file for reading
-    fd = open("example.txt", O_RDONLY);
+    fd = 0;//open("example.txt", O_RDONLY);
 	if (fd == -1) {
         perror("Error opening file");
         exit(EXIT_FAILURE);
@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
 		char *test1 = get_next_line(fd);
 		printf("LINE_IND: %d = %s", a, test1);
 	}
-
+		// char *test1 = get_next_line(fd);
+		// printf("LINE_IND = %s", test1);
 	// char *test1 = get_next_line(fd);
 	// printf("nextlen = %s", test1);
 	// char *test2 = get_next_line(fd);
@@ -31,15 +32,6 @@ int main(int argc, char *argv[])
 	// char *test3 = get_next_line(fd);
 	// printf("nextlen = %s", test3);
     // Close the file descriptor
-    if (close(fd) == -1) {
-        perror("Error closing file");
-        exit(EXIT_FAILURE);
-    }
-
-	if (argc == 10)
-	{
-		printf("dd  %s \n", argv[1]);
-	}
 
     return 0;
 
