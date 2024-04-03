@@ -12,17 +12,24 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+	// char *test1 = get_next_line(fd);
+	// printf("nextlen = %s", test1);
 
-	for (int a = 7; a > 0; a--)
+
+	// char *test2 = get_next_line(fd);
+	// printf("nextlen = %s", test2);
+	for (int a = 0; a < 10; a++ )
 	{
 		char *test1 = get_next_line(fd);
-		printf("nextlen = %s", test1);
+		printf("LINE_IND: %d = %s", a, test1);
 	}
 
 	// char *test1 = get_next_line(fd);
 	// printf("nextlen = %s", test1);
 	// char *test2 = get_next_line(fd);
 	// printf("nextlen = %s", test2);
+	// char *test3 = get_next_line(fd);
+	// printf("nextlen = %s", test3);
     // Close the file descriptor
     if (close(fd) == -1) {
         perror("Error closing file");

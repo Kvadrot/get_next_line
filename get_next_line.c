@@ -6,37 +6,62 @@
 /*   By: itykhono <itykhono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 12:07:43 by itykhono          #+#    #+#             */
-/*   Updated: 2024/03/31 15:14:05 by itykhono         ###   ########.fr       */
+/*   Updated: 2024/04/03 13:06:37 by itykhono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 static int debug = 0;
+int breaker = 0;
 
-int	ft_strlen(char *str)
+int ft_len_new_line(char *str)
 {
-	int len;
+	int i = 0;
 
-	len = 0;
-	while (str[len] != '\n')
-	{
-		len++;
-	}
-	len++;
-	return (len);
+	while (str[i] != '\n')
+		i++;
+	return (i += 1);
 }
 
-void	*ft_strjoin(char **joined, char *s2, int s1len, int s2len)
+void	*ft_memmove(void *dest, const void *src, size_t n)
+{
+	size_t	counter;
+
+	if ((char *)dest > (char *)src)
+	{
+		counter = n;
+		while (counter > 0)
+		{
+			counter--;
+			*((char *)dest + counter) = *((char *)src + counter);
+		}
+	}
+	else
+	{
+		counter = 0;
+		while (counter < n)
+		{
+			*((char *)dest + counter) = *((char *)src + counter);
+			counter++;
+		}
+	}
+	return (dest);
+}
+
+
+void	*ft_strjoin(char **joined, char *s2, int s1len, int s2len) // null, $$$$^C, 0, 1
 {
 	char	*newstr;
 	int		ind;
 	int		nextInd;
 
-	newstr = (char *)malloc((s1len + s2len) * sizeof(char));
+	newstr = (char *)malloc((s1len + s2len) * sizeof(char) + 1);
 	if (!newstr)
 	{
 		printf("LOX\n");
+		printf("s1len = %d\n", s1len);
+		printf("s2len = %d\n", s2len);
 		printf("joining SIZE = %d\n", s1len + s2len);
 		return (NULL);
 	}
@@ -55,6 +80,8 @@ void	*ft_strjoin(char **joined, char *s2, int s1len, int s2len)
 		ind++;
 		nextInd++;
 	}
+	newstr[ind] = '\0';
+	// printf("\n");
 	if (*joined != NULL)
 		free(*joined);
 	*joined = newstr;
@@ -66,9 +93,22 @@ int	ft_strchr(char *str, int strlen)
 	int ind;
 
 	ind = 0;
-	while (str[ind] != '\n' && ind < strlen) //BUFFER_SIZE
+
+	if (strlen == 0)
+	{
+		// printf("strlne = 0\n");
+		return(-420);
+	}
+	while (str[ind] != '\n' && ind < strlen - 1 && str[ind] != '\0')
 		ind++;
-	if (str[ind] == '\n')
+
+	// if (breaker == 4)
+	// {
+	// 	printf("str = %s\n", str);
+	// 	printf("ind = %d\n", ind);
+	// 	printf("strlen = %d\n", strlen);
+	// }
+	if (str[ind] == '\n' || str[ind] == '\0')
 		return (ind);
 	else
 		return (-404);
@@ -102,113 +142,94 @@ char	*ft_substr(char *s, int start, int len)
 	return (substr);
 }
 
-
-
 char	*get_next_line(int fd)
 {
-	static char	*buffer = NULL;
+	static char	buffer[BUFFER_SIZE];
 	static int	bytes_read = 0;
 	char		*new_line;
 	int			new_linelen;
-
+	int			line_end_size;
 
 	new_linelen = 0;
 	new_line = NULL;
 
-	// if (debug == 1)
-	// {
-	// 	return (NULL);
-	// }
-	if (!buffer && bytes_read == 0)
+	if (bytes_read == 0)
 	{
-		buffer = (char *)malloc((BUFFER_SIZE) * sizeof(char));
-		if (!buffer) {
-			printf("ZDES\n");
-			return (NULL);
-		}
-		// printf("BUFFER IS CREATED\n");
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-
 	}
 
-    if (bytes_read == -1)
+    if (bytes_read == -1 || bytes_read == 0)
 		return (NULL);
 
-	// printf("\n=======================\n");
-	// printf("ft_strchr(buffer, bytes_read) = %d \n", ft_strchr(buffer, bytes_read));
-	// printf("bytes_read = %d \n", bytes_read);
-	// printf("new_linelen = %d \n", new_linelen);
-	// printf("\n=======================\n");
-	// int a = 11;
-
-	if (debug == 1)
-	{
-		// printf("\n=======================\n");
-		// printf("ft_strchr(buffer, bytes_read) = %d \n", ft_strchr(buffer, bytes_read));
-		// printf("bytes_read = %d \n", bytes_read);
-		// printf("new_linelen = %d \n", new_linelen);
-		// printf("buffer = %s \n", buffer);
-		// printf("\n=======================\n");
-	}
-	while (ft_strchr(buffer, bytes_read) < 0)
+	// if (debug == 0)
+	// {
+	// 	printf("STEP01 CYCLE: %d\n", debug);
+	// 	printf("=========================\n");
+	// 	printf("bytes_read = %d\n", bytes_read);
+	// 	printf("buffer = %s\n", buffer);
+	// 	printf("new_line = %s\n", new_line);
+	// 	printf("ft_strchr(buffer, bytes_read) = %d\n", ft_strchr(buffer, bytes_read));
+	// }
+	while (ft_strchr(buffer, bytes_read) == -404)
 	{
 		ft_strjoin(&new_line, buffer, new_linelen, bytes_read);
 		new_linelen += bytes_read;
-		bytes_read = read(fd, buffer, bytes_read);
-		// a--;
-		// if (a == 0)
-		// 	break;
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
 	}
+	
+	// if (debug == 1)
+	// {
+	// 	printf("STEP: 02 CYCLE: %d\n", debug);
+	// 	printf("=========================\n");
+	// 	printf("bytes_read = %d\n", bytes_read);
+	// 	printf("breaker = %d\n", breaker);
+	// 	printf("buffer = %s\n", buffer);
+	// 	printf("new_line = %s\n", new_line);
+	// }
 
-	if (debug == 1)
-	{
-			
-		printf("buffer = %s \n", buffer);
-		printf("bytes_read = %d \n", bytes_read);
-		printf("ft_strchr(buffer, bytes_read) = %d \n", ft_strchr(buffer, bytes_read));
-			// fflush(stdout);
-	}
-
-	// printf("\n=======================\n");
-	// printf("ft_strchr(buffer, bytes_read) = %d \n", ft_strchr(buffer, bytes_read));
-	// printf("bytes_read = %d \n", bytes_read);
-	// printf("new_linelen = %d \n", new_linelen);
-	// printf("\n=======================\n");
-	
-	
-	char *s2 = ft_substr(buffer, 0, ft_strchr(buffer, bytes_read) + 1); //good job
-	// printf("s2 = %s \n", s2);
-	// printf("buffer = %s\n", buffer);
-	
-	ft_strjoin(&new_line, s2, new_linelen, ft_strchr(buffer, bytes_read) + 1);
-	new_linelen += ft_strchr(buffer, bytes_read) + 1;
-	
-	// printf("\n=======================\n");
-	// printf("new_line = %s \n", new_line);
-	// printf("Buffer = %s\n", buffer);
-	// printf("ft_substr(buffer, new_linelen, bytes_read - new_linelen) = %s \n", ft_substr(buffer, new_linelen, bytes_read - new_linelen));
-	// printf("bytes_read = %d \n", bytes_read - (ft_strchr(buffer, bytes_read) + 1));
-	// printf("\n=======================\n");
-	// return (new_line);
-	buffer = ft_substr(buffer, new_linelen, bytes_read - new_linelen);
-		// printf("Buffer = %s\n", buffer);
-	if (!buffer)
-		bytes_read = 0;
+	if (ft_strchr(buffer, bytes_read) == -420)
+		line_end_size = 0;
 	else
-		bytes_read = bytes_read - (ft_strchr(buffer, bytes_read) + 1);
+		line_end_size = ft_strchr(buffer, bytes_read) + 1;
+	
+	// if (debug == 1)
+	// {
+	// 	printf("STEP: 02 CYCLE: %d\n", debug);
+	// 	printf("=========================\n");
+	// 	printf("bytes_read = %d\n", bytes_read);
+	// 	printf("new_linelen = %d\n", new_linelen);
+	// 	printf("line_end_size = %d\n", line_end_size);
+	// 	printf("new_line = %s\n", new_line);
+	// 	printf("buffer = %s\n", buffer);
+	// }
+
+	ft_strjoin(&new_line, buffer, new_linelen, line_end_size);
+	new_linelen += line_end_size;
+
+	// if (debug == 1)
+	// {
+	// 	printf("STEP03 CYCLE: %d\n", debug);
+	// 	printf("=========================\n");
+	// 	printf("new_line = %s", new_line);
+	// 	printf("line_end_size = %d\n", line_end_size);
+	// 	printf("new_line.count = %d\n", ft_len_new_line(new_line));
+	// }
+
+	if (bytes_read > line_end_size)
+	{
+		ft_memmove(buffer, buffer + line_end_size, bytes_read - line_end_size);
+		bytes_read -= line_end_size;
+	}
+	else
+		bytes_read = 0;
+	
 	// if (debug == 0)
 	// {
-	// 	printf("\n=======================\n");
-	// 	printf("new_line = %s \n", new_line);
-	// 	printf("Buffer = %s\n", buffer);
-	// 	printf("bytes_read = %d \n", bytes_read);
-	// 	printf("\n=======================\n");
+	// 	printf("LASTSTEP CYCLE: %d\n", debug);
+	// 	printf("=========================\n");
+	// 	printf("bytes_read = %d\n", bytes_read);
+	// 	printf("line_end_size = %d\n", line_end_size);
 	// }
-	// printf("\n=======================\n");
-	// printf("new_line = %s \n", new_line);
-	// printf("Buffer = %s\n", buffer);
-	// printf("bytes_read = %d \n", bytes_read);
-	// printf("\n=======================\n");
 	debug++;
 	return (new_line);
 }

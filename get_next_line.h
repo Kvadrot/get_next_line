@@ -6,7 +6,7 @@
 /*   By: itykhono <itykhono@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 12:07:50 by itykhono          #+#    #+#             */
-/*   Updated: 2024/03/26 10:10:21 by itykhono         ###   ########.fr       */
+/*   Updated: 2024/03/31 16:20:59 by itykhono         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <string.h>
 
 char	*get_next_line(int fd);
 
